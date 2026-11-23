@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khám phá lễ hội truyền thống miền Trung</title>
+<style>
+:root{
+  --bg:#07152b;--panel:#102544;--panel2:#17365d;--gold:#ffd166;
+  --cyan:#61dafb;--white:#f7fbff;--muted:#b8c9df;--green:#20c997;--red:#ff647c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--white)}
+body{
+  min-height:100vh; overflow-x:hidden;
+  background:
+    radial-gradient(circle at 12% 15%,rgba(35,119,178,.25),transparent 28%),
+    radial-gradient(circle at 88% 80%,rgba(239,160,57,.17),transparent 30%),
+    linear-gradient(135deg,#061225,#0a1d38 55%,#10294a);
+}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+.app{width:min(1500px,96vw);min-height:100vh;margin:auto;padding:24px 0;display:flex;flex-direction:column}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:1px;color:var(--gold);font-size:clamp(14px,1.5vw,20px)}
+.brand-icon{width:42px;height:42px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;font-size:22px}
+.tools{display:flex;gap:10px;flex-wrap:wrap}
+.small-btn{border:1px solid #54708f;background:#132d4c;color:white;border-radius:12px;padding:10px 14px;font-weight:700}
+.small-btn:hover{background:#21466f}
+.screen{display:none;flex:1}
+.screen.active{display:flex;flex-direction:column}
+.hero,.result{margin:auto;width:min(1050px,100%);text-align:center;padding:clamp(24px,5vw,70px);border:1px solid rgba(255,255,255,.13);border-radius:28px;background:linear-gradient(145deg,rgba(20,49,82,.96),rgba(8,26,49,.96));box-shadow:0 24px 80px rgba(0,0,0,.3)}
+.kicker{color:var(--cyan);font-weight:800;letter-spacing:4px;text-transform:uppercase;font-size:clamp(12px,1.5vw,17px)}
+h1{font-size:clamp(34px,5.4vw,72px);line-height:1.08;margin:18px 0;color:var(--gold);text-shadow:0 5px 25px rgba(255,209,102,.18)}
+.hero p,.result p{font-size:clamp(16px,1.7vw,22px);line-height:1.6;color:var(--muted);max-width:800px;margin:16px auto 28px}
+.hero-art{font-size:clamp(50px,8vw,100px);margin:12px 0}
+.primary{border:0;border-radius:15px;padding:17px 36px;background:linear-gradient(100deg,#ffbd4a,#ffe08a);color:#14233a;font-size:clamp(17px,1.7vw,22px);font-weight:900;box-shadow:0 10px 28px rgba(255,190,74,.2);transition:.2s}
+.primary:hover{transform:translateY(-2px);filter:brightness(1.06)}
+.instructions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:24px}
+.pill{padding:9px 14px;background:#17385c;border:1px solid #31577f;border-radius:30px;color:#d8e8fa;font-size:14px}
+.quiz-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:6px 0 16px}
+.progress-wrap{flex:1}
+.progress-label{display:flex;justify-content:space-between;color:var(--muted);font-weight:700;margin-bottom:8px;font-size:clamp(13px,1.3vw,17px)}
+.progress{height:12px;background:#1b3655;border-radius:20px;overflow:hidden}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--gold));border-radius:20px;transition:width .35s}
+.timer{min-width:100px;text-align:center;padding:12px 15px;border-radius:14px;background:#17385c;border:1px solid #416184;font-weight:900;font-size:clamp(20px,2.2vw,28px);color:var(--gold)}
+.timer.warning{color:var(--red);border-color:var(--red);animation:pulse .8s infinite alternate}
+@keyframes pulse{to{transform:scale(1.04);box-shadow:0 0 20px rgba(255,100,124,.3)}}
+.question-card{background:linear-gradient(145deg,rgba(19,47,79,.98),rgba(12,32,57,.98));border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:clamp(20px,3vw,42px);box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.question-number{color:var(--cyan);font-weight:900;letter-spacing:2px;font-size:clamp(13px,1.4vw,17px)}
+.question{font-size:clamp(25px,3.3vw,43px);line-height:1.25;margin:14px 0 26px;font-weight:900}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.answer{min-height:88px;text-align:left;display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:17px;border:2px solid #345779;background:linear-gradient(120deg,#17385c,#102b4a);color:white;font-size:clamp(17px,2vw,25px);font-weight:750;transition:.18s}
+.answer:hover:not(:disabled){transform:translateY(-2px);border-color:var(--gold);background:#20466e}
+.letter{flex:0 0 42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#274d73;color:var(--gold);font-weight:1000}
+.answer.wrong{border-color:var(--red);background:rgba(255,100,124,.16);animation:shake .3s}
+.answer.wrong .letter{background:var(--red);color:#fff}
+.answer.correct{border-color:var(--green);background:rgba(32,201,151,.18)}
+.answer.correct .letter{background:var(--green);color:#05251d}
+.answer:disabled{cursor:default;opacity:.82}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.feedback{margin-top:18px;min-height:32px;font-weight:900;font-size:clamp(18px,2vw,25px);text-align:center}
+.feedback.bad{color:var(--red)}.feedback.good{color:var(--green)}
+.explanation{display:none;margin-top:18px;padding:20px 22px;border-radius:17px;border:1px solid rgba(97,218,251,.35);background:linear-gradient(120deg,rgba(19,70,94,.75),rgba(22,52,82,.9));}
+.explanation.show{display:block;animation:rise .35s ease}
+.explanation h3{margin:0 0 9px;color:var(--gold);font-size:clamp(17px,1.8vw,22px)}
+.explanation p{margin:0;color:#e4f1ff;line-height:1.55;font-size:clamp(15px,1.6vw,20px)}
+.next-row{display:flex;justify-content:center;margin-top:18px}
+.next-row button{display:none}.next-row button.show{display:inline-block}
+.statusline{text-align:center;color:var(--muted);margin-top:12px;font-size:14px}
+.result h2{font-size:clamp(32px,4vw,56px);color:var(--gold);margin:12px 0}
+.score{font-size:clamp(58px,8vw,100px);font-weight:1000;color:var(--green);margin:8px}
+.result-grid{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:20px 0 28px}
+.stat{background:#17385c;border:1px solid #355b80;border-radius:15px;padding:16px 24px;min-width:150px}
+.stat strong{display:block;font-size:30px;color:var(--gold);margin-bottom:5px}
+.footer{text-align:center;color:#7892b1;font-size:12px;padding:16px 0 0}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){
+ .app{width:94vw;padding:12px 0}.topbar{align-items:flex-start}.brand{font-size:12px}.brand-icon{width:34px;height:34px}
+ .answers{grid-template-columns:1fr}.answer{min-height:66px}.quiz-head{align-items:stretch}.timer{min-width:82px}
+ .question-card{padding:18px}.hero,.result{padding:28px 18px}
+}
+@media(min-width:1500px){.app{width:min(1600px,94vw)}.question-card{padding:48px}.answer{min-height:105px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><span class="brand-icon">🏮</span><span>GAMESHOW KIẾN THỨC VIỆT</span></div>
+    <div class="tools">
+      <button class="small-btn" id="soundBtn" type="button">🔊 Âm thanh: Bật</button>
+      <button class="small-btn" id="fullscreenBtn" type="button">⛶ Toàn màn hình</button>
+    </div>
+  </header>
+
+  <main id="startScreen" class="screen active">
+    <section class="hero">
+      <div class="kicker">Hành trình khám phá văn hóa</div>
+      <div class="hero-art">🥁 🏮 🌊</div>
+      <h1>KHÁM PHÁ LỄ HỘI<br>TRUYỀN THỐNG MIỀN TRUNG</h1>
+      <p>Cùng khám phá những lễ hội đặc sắc gắn với lịch sử, văn hóa biển và tín ngưỡng dân gian của dải đất miền Trung thân thương.</p>
+      <button class="primary" id="startBtn" type="button">▶ BẮT ĐẦU</button>
+      <div class="instructions">
+        <span class="pill">20 câu hỏi</span><span class="pill">Chọn sai được thử lại</span>
+        <span class="pill">Đúng mới qua câu tiếp</span><span class="pill">Có giải thích kiến thức</span>
+      </div>
+    </section>
+  </main>
+
+  <main id="quizScreen" class="screen">
+    <div class="quiz-head">
+      <div class="progress-wrap">
+        <div class="progress-label"><span id="progressText">CÂU 1 / 20</span><span id="scoreText">Điểm: 0</span></div>
+        <div class="progress"><div id="progressBar"></div></div>
+      </div>
+      <div class="timer" id="timer">⏱ 20</div>
+    </div>
+    <section class="question-card">
+      <div class="question-number" id="questionNumber">CÂU HỎI SỐ 01</div>
+      <div class="question" id="questionText"></div>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+      <div class="explanation" id="explanation">
+        <h3>💡 BẠN CÓ BIẾT?</h3>
+        <p id="explanationText"></p>
+      </div>
+      <div class="next-row"><button class="primary" id="nextBtn" type="button">CÂU TIẾP THEO →</button></div>
+      <div class="statusline">Phím tắt: A / B / C / D để chọn đáp án · Enter để sang câu tiếp theo · F để toàn màn hình</div>
+    </section>
+  </main>
+
+  <main id="resultScreen" class="screen">
+    <section class="result">
+      <div class="hero-art">🏆 🎉 🏆</div>
+      <div class="kicker">Bạn đã hoàn thành thử thách</div>
+      <h2>CHÚC MỪNG!</h2>
+      <div class="score" id="finalScore">20/20</div>
+      <p id="resultMessage">Bạn đã khám phá thành công 20 câu hỏi về lễ hội truyền thống miền Trung!</p>
+      <div class="result-grid">
+        <div class="stat"><strong id="correctStat">20</strong><span>Câu đúng</span></div>
+        <div class="stat"><strong id="wrongStat">0</strong><span>Lượt chọn sai</span></div>
+        <div class="stat"><strong id="attemptStat">20</strong><span>Tổng lượt chọn</span></div>
+      </div>
+      <button class="primary" id="restartBtn" type="button">↻ CHƠI LẠI</button>
+    </section>
+  </main>
+  <footer class="footer">KHÁM PHÁ VẺ ĐẸP VĂN HÓA MIỀN TRUNG · TRÒ CHƠI HỌC TẬP</footer>
+</div>
+
+<script>
+const questions = [
+ {q:"Lễ hội Đống Đa được tổ chức tại tỉnh nào?",a:["Quảng Nam","Bình Định","Nghệ An","Thanh Hóa"],c:1,e:"Lễ hội Đống Đa được tổ chức tại Bình Định, gắn với truyền thống hào hùng của phong trào Tây Sơn và người anh hùng áo vải Quang Trung."},
+ {q:"Lễ hội Đống Đa diễn ra vào thời gian nào?",a:["Mùng 4 – mùng 5 Tết Nguyên đán","Mùng 10 tháng Giêng âm lịch","Rằm tháng Giêng âm lịch","Ngày 22 tháng 8 âm lịch"],c:0,e:"Lễ hội diễn ra vào mùng 4 – mùng 5 Tết Nguyên đán. Đây là dịp tưởng nhớ chiến thắng lịch sử và các anh hùng dân tộc."},
+ {q:"Lễ hội Đống Đa tưởng nhớ chiến thắng lịch sử nào?",a:["Chiến thắng Điện Biên Phủ","Chiến thắng Bạch Đằng","Chiến thắng Ngọc Hồi – Đống Đa","Chiến thắng Chi Lăng"],c:2,e:"Chiến thắng Ngọc Hồi – Đống Đa gắn với cuộc đại phá quân Thanh của vua Quang Trung vào mùa xuân năm Kỷ Dậu 1789."},
+ {q:"Lễ hội vật làng Sình được tổ chức ở đâu?",a:["Nghệ An","Huế","Bình Thuận","Khánh Hòa"],c:1,e:"Lễ hội vật làng Sình được tổ chức tại Huế, là một nét văn hóa truyền thống đặc sắc, thể hiện tinh thần thượng võ của người dân địa phương."},
+ {q:"Lễ hội vật làng Sình diễn ra vào ngày nào?",a:["Mùng 5 tháng Giêng âm lịch","Mùng 10 tháng Giêng âm lịch","Rằm tháng Giêng âm lịch","Ngày 12 tháng 2 âm lịch"],c:1,e:"Hội vật làng Sình diễn ra vào mùng 10 tháng Giêng âm lịch, mang ý nghĩa gìn giữ tinh thần thượng võ và nét sinh hoạt văn hóa đầu xuân."},
+ {q:"Lễ hội Cầu Ngư gắn liền với tín ngưỡng thờ vị thần nào?",a:["Cá Ông","Thần Núi","Thần Sông","Thần Lúa"],c:0,e:"Lễ hội Cầu Ngư gắn với tín ngưỡng thờ Cá Ông, vị thần biển được nhiều cộng đồng ngư dân ven biển kính trọng và tôn thờ."},
+ {q:"Mục đích chính của lễ hội Cầu Ngư là gì?",a:["Tưởng nhớ các vị vua","Cầu mưa thuận gió hòa, đánh bắt bội thu","Kỷ niệm chiến thắng lịch sử","Cầu cho mùa màng trên núi"],c:1,e:"Lễ hội thể hiện mong ước biển yên sóng lặng, mưa thuận gió hòa và những chuyến ra khơi thuận lợi, đánh bắt được mùa."},
+ {q:"Lễ hội Đền Vua Mai được tổ chức tại tỉnh nào?",a:["Thanh Hóa","Quảng Nam","Nghệ An","Bình Định"],c:2,e:"Lễ hội Đền Vua Mai diễn ra ở Nam Đàn, Nghệ An, nhằm tưởng nhớ Mai Hắc Đế, vị anh hùng lãnh đạo cuộc khởi nghĩa chống nhà Đường."},
+ {q:"Lễ hội Đền Vua Mai diễn ra vào thời gian nào?",a:["Mùng 10 tháng Giêng âm lịch","Rằm tháng Giêng âm lịch","Ngày 12 tháng 2 âm lịch","Ngày 22 tháng 8 âm lịch"],c:1,e:"Lễ hội Đền Vua Mai được tổ chức vào rằm tháng Giêng âm lịch, với các nghi lễ như rước nước, dâng hương và nhiều trò chơi dân gian."},
+ {q:"Lễ hội Bà Thu Bồn được tổ chức vào ngày nào?",a:["Ngày 12 tháng 2 âm lịch","Ngày 14 tháng 9 âm lịch","Ngày 22 tháng 8 âm lịch","Rằm tháng Giêng âm lịch"],c:0,e:"Lễ hội Bà Thu Bồn diễn ra ngày 12 tháng 2 âm lịch tại Duy Xuyên, Quảng Nam, thể hiện tín ngưỡng dân gian và sự gắn bó của cư dân với dòng sông Thu Bồn."},
+ {q:"Lễ hội Tháp Bà Pônagar được tổ chức ở tỉnh nào?",a:["Bình Thuận","Khánh Hòa","Quảng Nam","Nghệ An"],c:1,e:"Lễ hội Tháp Bà Pônagar được tổ chức tại Nha Trang, Khánh Hòa vào tháng 3 âm lịch, là dịp tưởng nhớ Thiên Y A Na Thánh Mẫu."},
+ {q:"Lễ hội Lam Kinh được tổ chức vào ngày nào?",a:["Ngày 12 tháng 2 âm lịch","Ngày 22 tháng 8 âm lịch","Ngày 14 tháng 9 âm lịch","Mùng 10 tháng Giêng âm lịch"],c:1,e:"Lễ hội Lam Kinh diễn ra ngày 22 tháng 8 âm lịch tại Thanh Hóa, nhằm tưởng nhớ vua Lê Thái Tổ (Lê Lợi) và các nhân vật lịch sử thời Lê."},
+ {q:"Lễ hội Katê là lễ hội truyền thống của cộng đồng dân tộc nào?",a:["Dân tộc Thái","Dân tộc Chăm","Dân tộc Mường","Dân tộc Tày"],c:1,e:"Katê là lễ hội truyền thống quan trọng của cộng đồng người Chăm, mang ý nghĩa tưởng nhớ tổ tiên, thần linh và các vị anh hùng."},
+ {q:"Những nhạc cụ nào thường xuất hiện trong lễ hội Katê?",a:["Đàn tranh, sáo trúc","Trống Gi năng, kèn Saranai","Đàn bầu, đàn nguyệt","Cồng chiêng, đàn đá"],c:1,e:"Trống Gi năng và kèn Saranai là những nhạc cụ đặc trưng, tạo nên âm thanh rộn ràng và nét riêng trong lễ hội Katê."},
+ {q:"Lễ hội Dinh Thầy Thím được tổ chức tại tỉnh nào?",a:["Bình Định","Khánh Hòa","Bình Thuận","Thanh Hóa"],c:2,e:"Lễ hội Dinh Thầy Thím diễn ra tại Bình Thuận vào ngày 14 – 16 tháng 9 âm lịch, là lễ hội tín ngưỡng dân gian đặc sắc của người dân địa phương."},
+ {q:"Lễ hội Dinh Thầy Thím thường diễn ra vào ngày nào?",a:["Mùng 4 – 5 Tết","Ngày 14 – 16 tháng 9 âm lịch","Ngày 12 tháng 2 âm lịch","Ngày 22 tháng 8 âm lịch"],c:1,e:"Lễ hội Dinh Thầy Thím được tổ chức từ ngày 14 đến 16 tháng 9 âm lịch hằng năm, thu hút người dân và du khách đến dâng hương, tham gia các hoạt động văn hóa."},
+ {q:"Hoạt động nào là nét đặc sắc trong lễ hội Cầu Ngư ở các vùng biển miền Trung?",a:["Hát bả trạo","Đua voi","Múa xòe","Đua cà kheo trên núi"],c:0,e:"Hát bả trạo là hình thức diễn xướng dân gian gắn với đời sống ngư dân, thường xuất hiện trong lễ hội Cầu Ngư để thể hiện lòng thành kính với Cá Ông và ước mong chuyến biển bình an."},
+ {q:"Lễ hội Bà Thu Bồn gắn bó mật thiết với dòng sông nào?",a:["Sông Hương","Sông Thu Bồn","Sông Lam","Sông Gianh"],c:1,e:"Lễ hội Bà Thu Bồn gắn với dòng sông Thu Bồn ở Quảng Nam. Lễ hội thể hiện sự biết ơn và mong ước cuộc sống bình an, no đủ của cư dân ven sông."},
+ {q:"Lễ hội Lam Kinh gắn liền với triều đại nào trong lịch sử Việt Nam?",a:["Nhà Trần","Nhà Nguyễn","Nhà Lê sơ","Nhà Tây Sơn"],c:2,e:"Lễ hội Lam Kinh tưởng nhớ vua Lê Thái Tổ (Lê Lợi) và các nhân vật có công trong cuộc khởi nghĩa Lam Sơn, mở đầu cho triều Lê sơ."},
+ {q:"Lễ hội Tháp Bà Pônagar tưởng nhớ vị nữ thần nào?",a:["Thiên Y A Na Thánh Mẫu","Bà Chúa Xứ","Thánh Gióng","Âu Cơ"],c:0,e:"Lễ hội Tháp Bà Pônagar là dịp tưởng nhớ Thiên Y A Na Thánh Mẫu, vị thần được cộng đồng người Chăm và người Việt ở khu vực Nam Trung Bộ tôn kính."}
+];
+
+let index=0, score=0, wrong=0, attempts=0, timeLeft=20, timerId=null, soundOn=true, answered=false;
+const $=id=>document.getElementById(id);
+function showScreen(id){["startScreen","quizScreen","resultScreen"].forEach(x=>$(x).classList.toggle("active",x===id))}
+function playTone(kind){
+ if(!soundOn)return;
+ try{
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const notes=kind==="good"?[660,880,1100]:kind==="bad"?[220,165]:[520,660,880];
+  notes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(.0001,ctx.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.12,ctx.currentTime+i*.12+.02);g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+i*.12+.16);o.start(ctx.currentTime+i*.12);o.stop(ctx.currentTime+i*.12+.18)});
+  setTimeout(()=>ctx.close(),700);
+ }catch(e){}
+}
+function startGame(){index=0;score=0;wrong=0;attempts=0;showScreen("quizScreen");renderQuestion()}
+function renderQuestion(){
+ clearInterval(timerId);answered=false;timeLeft=20;
+ const q=questions[index];
+ $("progressText").textContent=`CÂU ${index+1} / ${questions.length}`;
+ $("scoreText").textContent=`Điểm: ${score}`;
+ $("progressBar").style.width=`${index/questions.length*100}%`;
+ $("questionNumber").textContent=`CÂU HỎI SỐ ${String(index+1).padStart(2,"0")}`;
+ $("questionText").textContent=q.q;
+ $("feedback").textContent="";$("feedback").className="feedback";
+ $("explanation").classList.remove("show");$("explanationText").textContent="";
+ $("nextBtn").classList.remove("show");
+ $("answers").innerHTML="";
+ q.a.forEach((answer,i)=>{
+  const b=document.createElement("button");b.type="button";b.className="answer";
+  b.innerHTML=`<span class="letter">${"ABCD"[i]}</span><span></span>`;
+  b.querySelector("span:last-child").textContent=answer;
+  b.addEventListener("click",()=>chooseAnswer(i,b));
+  $("answers").appendChild(b);
+ });
+ updateTimer();timerId=setInterval(tick,1000);
+}
+function updateTimer(){
+ $("timer").textContent=`⏱ ${timeLeft}`;
+ $("timer").classList.toggle("warning",timeLeft<=5);
+}
+function tick(){
+ if(answered)return;
+ timeLeft--;
+ if(timeLeft<=0){
+  clearInterval(timerId);
+  $("feedback").textContent="⏰ HẾT GIỜ! HÃY TIẾP TỤC SUY NGHĨ VÀ THỬ LẠI.";
+  $("feedback").className="feedback bad";
+  playTone("bad");
+  timeLeft=20;
+  setTimeout(()=>{if(!answered){updateTimer();timerId=setInterval(tick,1000)}},1400);
+ }else updateTimer();
+}
+function chooseAnswer(choice,button){
+ if(answered||button.disabled)return;
+ attempts++;
+ const q=questions[index];
+ if(choice===q.c){
+  answered=true;clearInterval(timerId);score++;
+  button.classList.add("correct");
+  document.querySelectorAll(".answer").forEach(b=>b.disabled=true);
+  $("feedback").textContent="✓ CHÍNH XÁC! XUẤT SẮC!";
+  $("feedback").className="feedback good";
+  $("explanationText").textContent=q.e;
+  $("explanation").classList.add("show");
+  $("scoreText").textContent=`Điểm: ${score}`;
+  $("progressBar").style.width=`${(index+1)/questions.length*100}%`;
+  $("nextBtn").textContent=index===questions.length-1?"XEM KẾT QUẢ 🏆":"CÂU TIẾP THEO →";
+  $("nextBtn").classList.add("show");
+  playTone("good");
+ }else{
+  wrong++;button.classList.add("wrong");button.disabled=true;
+  $("feedback").textContent="✕ CHƯA CHÍNH XÁC! HÃY THỬ ĐÁP ÁN KHÁC.";
+  $("feedback").className="feedback bad";playTone("bad");
+ }
+}
+function nextQuestion(){
+ if(!answered)return;
+ if(index<questions.length-1){index++;renderQuestion()}
+ else finishGame();
+}
+function finishGame(){
+ clearInterval(timerId);showScreen("resultScreen");
+ $("finalScore").textContent=`${score}/${questions.length}`;
+ $("correctStat").textContent=score;
+ $("wrongStat").textContent=wrong;
+ $("attemptStat").textContent=attempts;
+ $("resultMessage").textContent=score===20
+  ?"Tuyệt vời! Bạn đã chinh phục trọn vẹn 20 câu hỏi và khám phá thêm nhiều nét đẹp văn hóa miền Trung!"
+  :"Bạn đã hoàn thành hành trình khám phá 20 câu hỏi về lễ hội. Hãy chơi lại để ôn tập và ghi nhớ thêm nhé!";
+ playTone("finish");
+}
+function toggleFullscreen(){
+ if(!document.fullscreenElement){document.documentElement.requestFullscreen?.().catch(()=>{})}
+ else document.exitFullscreen?.();
+}
+$("startBtn").addEventListener("click",startGame);
+$("nextBtn").addEventListener("click",nextQuestion);
+$("restartBtn").addEventListener("click",startGame);
+$("fullscreenBtn").addEventListener("click",toggleFullscreen);
+$("soundBtn").addEventListener("click",()=>{soundOn=!soundOn;$("soundBtn").textContent=soundOn?"🔊 Âm thanh: Bật":"🔇 Âm thanh: Tắt";if(soundOn)playTone("good")});
+document.addEventListener("keydown",e=>{
+ if(e.key.toLowerCase()==="f"){e.preventDefault();toggleFullscreen();return}
+ if(!$("quizScreen").classList.contains("active"))return;
+ const k=e.key.toUpperCase();
+ if("ABCD".includes(k)&&!answered){
+  const b=$("answers").children["ABCD".indexOf(k)];
+  if(b&&!b.disabled)b.click();
+ }else if((e.key==="Enter"||e.key==="ArrowRight")&&answered){nextQuestion()}
+});
+</script>
+</body>
+</html>
